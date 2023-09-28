@@ -25,7 +25,7 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"strconv"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -36,38 +36,53 @@ var addCmd = &cobra.Command{
 	Use:   "add",
 	Short: "Adds a new note to today's note file",
 	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) == 0 {
+			fmt.Println("No note was provided to jot down")
+			os.Exit(0)
+		}
+		providedNote := args[0]
 		homeDirectory, err := os.UserHomeDir()
 		if err != nil {
-			fmt.Println("Could not find home directory")
-			os.Exit(1)
+			fmt.Println("Error getting home directory", err)
+			panic(err)
 		}
 		// Check if the notes directory exists
 		notesDirectory := path.Join(homeDirectory, "Documents", "totle")
-		_, err = safeCreateDirectory(notesDirectory)
+		nowFormatted := getNowFormatted()
+		year := strings.Split(nowFormatted, "-")[0]
+		month := strings.Split(nowFormatted, "-")[1]
+		currentNoteDirectory := path.Join(notesDirectory, year, month)
+		created, err := createDirectoryIfNotFound(currentNoteDirectory)
 		if err != nil {
-			fmt.Println("Failed to create notes directory")
-			os.Exit(2)
+			fmt.Println("Error creating note directory", currentNoteDirectory)
+			panic(err)
 		}
-		// Check if the directory for the year exists
-		now := time.Now()
-		year := strconv.Itoa(now.Year())
-		yearDirectory := path.Join(notesDirectory, year)
-		_, err = safeCreateDirectory(yearDirectory)
-		if err != nil {
-			fmt.Println("Failed to create year directory")
-			os.Exit(3)
+		if created {
+			fmt.Println("Created new directory at", currentNoteDirectory)
 		}
-		// Check if the directory for the month exists
-		month := strconv.Itoa(int(now.Month()))
-		monthDirectory := path.Join(yearDirectory, month)
-		_, err = safeCreateDirectory(monthDirectory)
-		if err != nil {
-			fmt.Println("Failed to create month directory")
-			os.Exit(4)
-		}
-		// Check if a note file for the day exists
+		currentNoteFilename := path.Join(currentNoteDirectory, nowFormatted + ".md")
 		// If no note file exists, create one with a new note
+		if !pathExists(currentNoteFilename) {
+			initialFileContents := "# " + nowFormatted + "\n\n- " + providedNote
+			err := appendToFile(currentNoteFilename, initialFileContents)
+			if (err != nil) {
+				fmt.Println("Error creating new note at", currentNoteFilename)
+				panic(err)
+			}
+			fmt.Println("Created new note at", currentNoteFilename)
+			os.Exit(0)
+		}
 		// If a note file exists, append a new note to the file
+		lastLine, err := getLastLineOfFile(currentNoteFilename)
+		if err != nil {
+			fmt.Println("Failed to add note to file", currentNoteFilename)
+			panic(err)
+		}
+		fileContentsToAppend := "- " + providedNote + "\n"
+		if lastLine != "" {
+			fileContentsToAppend = "\n" + fileContentsToAppend
+		}
+		appendToFile(currentNoteFilename, fileContentsToAppend)
 	},
 }
 
@@ -85,13 +100,12 @@ func init() {
 	// addCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func safeCreateDirectory(path string) (created bool, err error) {
-	created = false
+func createDirectoryIfNotFound(path string) (created bool, err error) {
 	if !pathExists(path) {
-		created = true
-		err = os.Mkdir(path, os.ModePerm)
+		err = os.MkdirAll(path, os.ModePerm)
+		return err != nil, err
 	}
-	return
+	return false, nil
 }
 
 func pathExists(path string) bool {
@@ -100,4 +114,34 @@ func pathExists(path string) bool {
 		return true
 	}
 	return !os.IsNotExist(err)
+}
+
+// See https://gosamples.dev/date-format-yyyy-mm-dd/#:~:text=To%20format%20date%20in%20Go,%2F01%2F2006%22%20layout.
+func getNowFormatted() string {
+	now := time.Now().UTC()
+	return now.Format("2006-01-02")
+}
+
+
+func appendToFile(path string, contents string) error {
+	file, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	if _, err := file.Write([]byte(contents)); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func getLastLineOfFile(path string) (lastLine string, err error) {
+	contents, err := os.ReadFile(path)
+    if err != nil {
+        return "", err
+    }
+	contentsByNewline := strings.Split(string(contents), "\n")
+	return contentsByNewline[len(contentsByNewline)-1], nil
 }
