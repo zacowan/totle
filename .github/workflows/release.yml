@@ -23,6 +23,8 @@ jobs:
         with:
           go-version: stable
       - uses: crazy-max/ghaction-chocolatey@v3
+        with:
+          args: -h
       - uses: goreleaser/goreleaser-action@v5
         with:
           distribution: goreleaser
