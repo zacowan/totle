@@ -42,3 +42,11 @@ changelog:
       - "^test:"
       - "^chore:"
       - "^ci:"
+
+brews:
+  - homepage: https://github.com/zacowan/totle
+    description: "totle is a simple tool to allow developers to jot down their thoughts for safe-keeping in a transferrable format."
+    repository:
+      owner: zacowan
+      name: homebrew-zacowan
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
