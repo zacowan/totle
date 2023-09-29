@@ -50,3 +50,16 @@ brews:
       owner: zacowan
       name: homebrew-zacowan
       token: "{{ .Env.TAP_GITHUB_TOKEN }}"
+
+chocolateys:
+  - owners: Zachary Cowan
+    authors: Zachary Cowan
+    project_url: https://github.com/zacowan/totle
+    copyright: 2023 Zachary Cowan
+    license_url: https://github.com/zacowan/totle/blob/main/LICENSE
+    project_source_url: https://github.com/zacowan/totle
+    docs_url: https://github.com/zacowan/totle/blob/main/README.md
+    bug_tracker_url: https://github.com/zacowan/totle/issues
+    tags: "notes markdown cli"
+    summary: "totle is a simple tool to allow developers to jot down their thoughts for safe-keeping in a transferrable format."
+    description: "totle is a simple tool to allow developers to jot down their thoughts for safe-keeping in a transferrable format."
