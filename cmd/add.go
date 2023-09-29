@@ -24,11 +24,10 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"path"
 	"strings"
-	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/zacowan/totle/internal"
 )
 
 // addCmd represents the add command
@@ -41,48 +40,42 @@ var addCmd = &cobra.Command{
 			os.Exit(0)
 		}
 		providedNote := args[0]
-		homeDirectory, err := os.UserHomeDir()
+
+		notesMeta := internal.GetNotesMeta("totle")
+
+		// Verify the directory for the note the reside in exists
+		created, err := createDirectoryIfNotFound(notesMeta.YearMonthDir)
 		if err != nil {
-			fmt.Println("Error getting home directory", err)
-			panic(err)
-		}
-		// Check if the notes directory exists
-		notesDirectory := path.Join(homeDirectory, "Documents", "totle")
-		nowFormatted := getNowFormatted()
-		year := strings.Split(nowFormatted, "-")[0]
-		month := strings.Split(nowFormatted, "-")[1]
-		currentNoteDirectory := path.Join(notesDirectory, year, month)
-		created, err := createDirectoryIfNotFound(currentNoteDirectory)
-		if err != nil {
-			fmt.Println("Error creating note directory", currentNoteDirectory)
+			fmt.Println("Error creating year/month directory", notesMeta.YearMonthDir)
 			panic(err)
 		}
 		if created {
-			fmt.Println("Created new directory at", currentNoteDirectory)
+			fmt.Println("Created new directory at", notesMeta.YearMonthDir)
 		}
-		currentNoteFilename := path.Join(currentNoteDirectory, nowFormatted + ".md")
+
 		// If no note file exists, create one with a new note
-		if !pathExists(currentNoteFilename) {
-			initialFileContents := "# " + nowFormatted + "\n\n- " + providedNote
-			err := appendToFile(currentNoteFilename, initialFileContents)
+		if !pathExists(notesMeta.TodayNotePath) {
+			initialFileContents := "# " + notesMeta.TodayFormatted.Full + "\n\n- " + providedNote
+			err := appendToFile(notesMeta.TodayNotePath, initialFileContents)
 			if (err != nil) {
-				fmt.Println("Error creating new note at", currentNoteFilename)
+				fmt.Println("Failed to create new note at", notesMeta.TodayNotePath)
 				panic(err)
 			}
-			fmt.Println("Created new note at", currentNoteFilename)
+			fmt.Println("Created new note at", notesMeta.TodayNotePath)
 			os.Exit(0)
 		}
+
 		// If a note file exists, append a new note to the file
-		lastLine, err := getLastLineOfFile(currentNoteFilename)
+		lastLine, err := getLastLineOfFile(notesMeta.TodayNotePath)
 		if err != nil {
-			fmt.Println("Failed to add note to file", currentNoteFilename)
+			fmt.Println("Failed to add note to file", notesMeta.TodayNotePath)
 			panic(err)
 		}
 		fileContentsToAppend := "- " + providedNote + "\n"
 		if lastLine != "" {
 			fileContentsToAppend = "\n" + fileContentsToAppend
 		}
-		appendToFile(currentNoteFilename, fileContentsToAppend)
+		appendToFile(notesMeta.TodayNotePath, fileContentsToAppend)
 	},
 }
 
@@ -115,13 +108,6 @@ func pathExists(path string) bool {
 	}
 	return !os.IsNotExist(err)
 }
-
-// See https://gosamples.dev/date-format-yyyy-mm-dd/#:~:text=To%20format%20date%20in%20Go,%2F01%2F2006%22%20layout.
-func getNowFormatted() string {
-	now := time.Now().UTC()
-	return now.Format("2006-01-02")
-}
-
 
 func appendToFile(path string, contents string) error {
 	file, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
