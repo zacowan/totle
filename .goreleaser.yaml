@@ -63,3 +63,5 @@ chocolateys:
     tags: "notes markdown cli"
     summary: "totle is a simple tool to allow developers to jot down their thoughts for safe-keeping in a transferrable format."
     description: "totle is a simple tool to allow developers to jot down their thoughts for safe-keeping in a transferrable format."
+    api_key: "{{ .Env.CHOCOLATEY_API_KEY }}"
+    source_repo: "https://push.chocolatey.org/"
