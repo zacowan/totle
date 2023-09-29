@@ -27,6 +27,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/zacowan/totle/internal"
 )
 
@@ -34,48 +35,37 @@ import (
 var addCmd = &cobra.Command{
 	Use:   "add",
 	Short: "Adds a new note to today's note file",
+	Long: `If no note file exists for today, a new note file is created with the
+contents of the note you want to add. If a note file already exists for today,
+the contents of the note you want to add are appended to that file.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
-			fmt.Println("No note was provided to jot down")
+			fmt.Println("No note was provided to add to the note file")
 			os.Exit(0)
 		}
 		providedNote := args[0]
 
-		notesMeta := internal.GetNotesMeta("totle")
+		notesDirName := viper.GetString(notesDirNameKey)
+		notesMeta := internal.GetNotesMeta(notesDirName)
 
-		// Verify the directory for the note the reside in exists
-		created, err := createDirectoryIfNotFound(notesMeta.YearMonthDir)
-		if err != nil {
-			fmt.Println("Error creating year/month directory", notesMeta.YearMonthDir)
-			panic(err)
-		}
-		if created {
-			fmt.Println("Created new directory at", notesMeta.YearMonthDir)
-		}
+		createYearMonthDir(notesMeta)
 
-		// If no note file exists, create one with a new note
-		if !pathExists(notesMeta.TodayNotePath) {
-			initialFileContents := "# " + notesMeta.TodayFormatted.Full + "\n\n- " + providedNote
-			err := appendToFile(notesMeta.TodayNotePath, initialFileContents)
-			if (err != nil) {
-				fmt.Println("Failed to create new note at", notesMeta.TodayNotePath)
-				panic(err)
-			}
-			fmt.Println("Created new note at", notesMeta.TodayNotePath)
+		if !internal.PathExists(notesMeta.TodayNotePath) {
+			titleWithProvidedNoteAsMarkdown := "# " + notesMeta.TodayFormatted.Full + "\n\n- " + providedNote
+			createNoteFile(notesMeta.TodayNotePath, titleWithProvidedNoteAsMarkdown)
 			os.Exit(0)
 		}
 
-		// If a note file exists, append a new note to the file
-		lastLine, err := getLastLineOfFile(notesMeta.TodayNotePath)
+		lastLineOfNoteFile, err := getLastLineOfFile(notesMeta.TodayNotePath)
 		if err != nil {
-			fmt.Println("Failed to add note to file", notesMeta.TodayNotePath)
-			panic(err)
+			fmt.Println("Failed to add note to note file at", notesMeta.TodayNotePath)
+			cobra.CheckErr(err)
 		}
-		fileContentsToAppend := "- " + providedNote + "\n"
-		if lastLine != "" {
-			fileContentsToAppend = "\n" + fileContentsToAppend
+		providedNoteAsMarkdown := "- " + providedNote + "\n"
+		if lastLineOfNoteFile != "" {
+			providedNoteAsMarkdown = "\n" + providedNoteAsMarkdown
 		}
-		appendToFile(notesMeta.TodayNotePath, fileContentsToAppend)
+		appendToFile(notesMeta.TodayNotePath, providedNoteAsMarkdown)
 	},
 }
 
@@ -93,20 +83,15 @@ func init() {
 	// addCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func createDirectoryIfNotFound(path string) (created bool, err error) {
-	if !pathExists(path) {
-		err = os.MkdirAll(path, os.ModePerm)
-		return err != nil, err
+func createYearMonthDir(notesMeta internal.NotesMeta) {
+	created, err := internal.CreateDirectoryIfNotFound(notesMeta.YearMonthDir)
+	if err != nil {
+		fmt.Println("Failed to create year/month directory", notesMeta.YearMonthDir)
+		cobra.CheckErr(err)
 	}
-	return false, nil
-}
-
-func pathExists(path string) bool {
-	_, err := os.Stat(path)
-	if err == nil {
-		return true
+	if created {
+		fmt.Println("Created new directory at", notesMeta.YearMonthDir)
 	}
-	return !os.IsNotExist(err)
 }
 
 func appendToFile(path string, contents string) error {

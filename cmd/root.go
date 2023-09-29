@@ -30,6 +30,7 @@ import (
 )
 
 var cfgFile string
+const notesDirNameKey = "notesDir"
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -60,6 +61,8 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	viper.SetDefault(notesDirNameKey, "totle")
+
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
@@ -74,7 +77,8 @@ func initConfig() {
 		viper.SetConfigName(".totle")
 	}
 
-	viper.AutomaticEnv() // read in environment variables that match
+	viper.SetEnvPrefix("totle")
+	viper.AutomaticEnv()
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {

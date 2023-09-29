@@ -56,6 +56,22 @@ func GetNotesMeta(notesDirName string) NotesMeta {
 	return notesMeta
 }
 
+func CreateDirectoryIfNotFound(path string) (created bool, err error) {
+	if !PathExists(path) {
+		err = os.MkdirAll(path, os.ModePerm)
+		return err != nil, err
+	}
+	return false, nil
+}
+
+func PathExists(path string) bool {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true
+	}
+	return !os.IsNotExist(err)
+}
+
 func getNotesDir(name string) string {
 	homeDirectory, err := os.UserHomeDir()
 	if err != nil {
@@ -67,7 +83,7 @@ func getNotesDir(name string) string {
 
 // See https://gosamples.dev/date-format-yyyy-mm-dd/#:~:text=To%20format%20date%20in%20Go,%2F01%2F2006%22%20layout.
 func getTodayFormatted() TodayFormatted {
-	now := time.Now().UTC()
+	now := time.Now().Local()
 	full := now.Format("2006-01-02")
 	return TodayFormatted{
 		Full: full,

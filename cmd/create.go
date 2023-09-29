@@ -24,55 +24,51 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"os/exec"
-	"path"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zacowan/totle/internal"
 )
 
-// openCmd represents the open command
-var openCmd = &cobra.Command{
-	Use:   "open",
-	Short: "Opens today's note in VSCode",
+// createCmd represents the create command
+var createCmd = &cobra.Command{
+	Use:   "create",
+	Short: "Creates a note file for today and opens it",
 	Run: func(cmd *cobra.Command, args []string) {
 		notesDirName := viper.GetString(notesDirNameKey)
 		notesMeta := internal.GetNotesMeta(notesDirName)
 
-		gotoPath := getGotoPathForTodayNote(notesMeta)
-		err := openWithVsCode(notesMeta.NotesDir, gotoPath)
+		createYearMonthDir(notesMeta)
 
-		if err != nil {
-			fmt.Println("Failed while starting 'code' command")
-			cobra.CheckErr(err)
+		if !internal.PathExists(notesMeta.TodayNotePath) {
+			todayAsMarkdownTitle := "# " + notesMeta.TodayFormatted.Full
+			createNoteFile(notesMeta.TodayNotePath, todayAsMarkdownTitle)
 		}
+
+		gotoPath := getGotoPathForTodayNote(notesMeta)
+		openWithVsCode(notesMeta.NotesDir, gotoPath)
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(openCmd)
+	rootCmd.AddCommand(createCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// openCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// createCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// openCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// createCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func openWithVsCode(path string, gotoPath string) error {
-	if !internal.PathExists(path) {
-		fmt.Println("Failed note - no note exists at", path)
-		os.Exit(0)
+func createNoteFile(path string, contents string) {
+	err := os.WriteFile(path, []byte(contents), os.ModePerm)
+	if err != nil {
+		fmt.Println("Failed to create note file at", path)
+		cobra.CheckErr(err)
 	}
-	codeCmd := exec.Command("code", path, "--goto " + gotoPath)
-	return codeCmd.Start()
-}
-
-func getGotoPathForTodayNote(notesMeta internal.NotesMeta) string {
-	return path.Join(notesMeta.TodayFormatted.Year, notesMeta.TodayFormatted.Month, notesMeta.TodayNoteFilename)
+	fmt.Println("Created new note file at", path)
 }
