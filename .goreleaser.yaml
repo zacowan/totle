@@ -38,11 +38,11 @@ changelog:
   sort: asc
   filters:
     exclude:
-      - "^docs(\(.*\))?:"
-      - "^test(\(.*\))?:"
-      - "^chore(\(.*\))?:"
-      - "^ci(\(.*\))?:"
-      - "^refactor(\(.*\))?:"
+      - "^docs(\\(.*\\))?:"
+      - "^test(\\(.*\\))?:"
+      - "^chore(\\(.*\\))?:"
+      - "^ci(\\(.*\\))?:"
+      - "^refactor(\\(.*\\))?:"
 
 brews:
   - homepage: https://github.com/zacowan/totle

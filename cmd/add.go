@@ -36,11 +36,8 @@ var addCmd = &cobra.Command{
 	Long: `If no note file exists for today, a new note file is created with the
 contents of the note you want to add. If a note file already exists for today,
 the contents of the note you want to add are appended to that file.`,
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) == 0 {
-			fmt.Println("No note was provided to add to the note file")
-			os.Exit(0)
-		}
 		providedNote := args[0]
 
 		notesMeta := GetNotesMeta()
