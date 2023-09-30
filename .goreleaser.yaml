@@ -49,7 +49,7 @@ brews:
     description: "totle is a simple tool to allow developers to jot down their thoughts for safe-keeping in a transferrable format."
     repository:
       owner: zacowan
-      name: homebrew-zacowan
+      name: homebrew-tap
       token: "{{ .Env.TAP_GITHUB_TOKEN }}"
 
 chocolateys:
