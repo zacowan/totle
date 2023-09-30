@@ -21,8 +21,7 @@ brew install totle
 
 ### Chocolatey
 
-> ![NOTE]
->
+> [!NOTE]
 > `totle` has only recently been published and needs to be verified by chocolatey. To install `totle` while the verification is in-progress, append the version you'd like to install with `--version=x.x.x`.
 
 ```sh
