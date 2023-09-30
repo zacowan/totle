@@ -77,7 +77,7 @@ For example, `totle add "Hello, world"` would produce the following note file co
 totle open
 ```
 
-Opens the note file for today using the `code` command.
+Opens the note file for today using the configured `open_cmd` command. By default, the note file is opened using the `code` command provided by VSCode.
 
 ### Configuration
 
