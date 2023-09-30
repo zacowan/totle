@@ -42,8 +42,7 @@ var createCmd = &cobra.Command{
 			createNoteFile(notesMeta.TodayNotePath, todayAsMarkdownTitle)
 		}
 
-		gotoPath := getGotoPathForTodayNote(notesMeta)
-		openWithVsCode(notesMeta.NotesDir, gotoPath)
+		openNoteFile(notesMeta)
 	},
 }
 

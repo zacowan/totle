@@ -32,8 +32,12 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Constants
 const noteExtension = ".md"
+
+// Config file keys
 const notesDirConfigKey = "notes_dir"
+const openCmdConfigKey = "open_cmd"
 
 var cfgFile string
 

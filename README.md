@@ -38,7 +38,9 @@ choco install totle
 totle create
 ```
 
-Creates a note file for today and opens it using the `code` command. If a note file already exists for today, that file is opened. Notes are named by today's date (`yyyy-mm-dd`) based on your local timezone. They are placed in the configured notes directory, and organized into folders based on the year and month of the note.
+Creates a note file for today and opens it using the configured `open_cmd` command. By default, the note file is opened using the `code` command provided by VSCode.
+
+If a note file already exists for today, that file is opened. Notes are named by today's date (`yyyy-mm-dd`) based on your local timezone. They are placed in the configured notes directory, and organized into folders based on the year and month of the note.
 
 For example, for a note created on January 1st, 1970, the notes directory would look like the following:
 
@@ -80,9 +82,15 @@ Opens the note file for today using the `code` command.
 
 ### Configuration
 
-`totle` supports being configured using a `.totle.yaml` file in your home directory. Alternatively, you can specify a different file the load configuration options from using the `--config [path/to/config.yaml]` flag. The following configuration options are supported:
+`totle` supports being configured using a `.totle.yaml` file in your home directory. Alternatively, you can specify a different file the load configuration options from using the `--config` flag. The following configuration options are supported:
 
 ```yaml
+# The command to use when opening a note file. The command is passed
+# the path to the note file as the first and only argument.
+#
+# Default: code
+open_cmd: open
+
 # The directory that your notes are stored in.
 #
 # Default: $HOME/Documents/totle

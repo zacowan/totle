@@ -28,6 +28,7 @@ import (
 	"path"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // openCmd represents the open command
@@ -36,14 +37,7 @@ var openCmd = &cobra.Command{
 	Short: "Opens the note file for today",
 	Run: func(cmd *cobra.Command, args []string) {
 		notesMeta := GetNotesMeta()
-
-		gotoPath := getGotoPathForTodayNote(notesMeta)
-		err := openWithVsCode(notesMeta.NotesDir, gotoPath)
-
-		if err != nil {
-			fmt.Println("Failed while starting 'code' command")
-			cobra.CheckErr(err)
-		}
+		openNoteFile(notesMeta)
 	},
 }
 
@@ -61,13 +55,30 @@ func init() {
 	// openCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func openWithVsCode(path string, gotoPath string) error {
+func openNoteFile(notesMeta NotesMeta) {
+	openCmdFromConfig := viper.GetString(openCmdConfigKey)
+
+	if openCmdFromConfig != "" {
+		openWithCmd(openCmdFromConfig, notesMeta.TodayNotePath)
+	}
+
+	gotoPath := getGotoPathForTodayNote(notesMeta)
+	openWithCmd("code", notesMeta.TodayNotePath, "--goto " + gotoPath)
+}
+
+func openWithCmd(cmd string, path string, arg ...string) {
 	if !PathExists(path) {
-		fmt.Println("Failed note - no note exists at", path)
+		fmt.Println("Failed to open - no note file exists at", path)
 		os.Exit(0)
 	}
-	codeCmd := exec.Command("code", path, "--goto " + gotoPath)
-	return codeCmd.Start()
+	args := []string{path}
+	args = append(args, arg...)
+	openCmdExec := exec.Command(cmd, args...)
+	err := openCmdExec.Start()
+	if err != nil {
+		fmt.Printf("Failed while starting '%s' command\n", cmd)
+		cobra.CheckErr(err)
+	}
 }
 
 func getGotoPathForTodayNote(notesMeta NotesMeta) string {
