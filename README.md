@@ -14,8 +14,7 @@
 ### Homebrew
 
 ```sh
-brew tap zacowan/zacowan
-
+brew tap zacowan/tap
 brew install totle
 ```
 
