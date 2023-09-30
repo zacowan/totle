@@ -27,8 +27,6 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"github.com/zacowan/totle/internal"
 )
 
 // addCmd represents the add command
@@ -45,12 +43,11 @@ the contents of the note you want to add are appended to that file.`,
 		}
 		providedNote := args[0]
 
-		notesDirName := viper.GetString(notesDirNameKey)
-		notesMeta := internal.GetNotesMeta(notesDirName)
+		notesMeta := GetNotesMeta()
 
 		createYearMonthDir(notesMeta)
 
-		if !internal.PathExists(notesMeta.TodayNotePath) {
+		if !PathExists(notesMeta.TodayNotePath) {
 			titleWithProvidedNoteAsMarkdown := "# " + notesMeta.TodayFormatted.Full + "\n\n- " + providedNote
 			createNoteFile(notesMeta.TodayNotePath, titleWithProvidedNoteAsMarkdown)
 			os.Exit(0)
@@ -81,17 +78,6 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// addCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-}
-
-func createYearMonthDir(notesMeta internal.NotesMeta) {
-	created, err := internal.CreateDirectoryIfNotFound(notesMeta.YearMonthDir)
-	if err != nil {
-		fmt.Println("Failed to create year/month directory", notesMeta.YearMonthDir)
-		cobra.CheckErr(err)
-	}
-	if created {
-		fmt.Println("Created new directory at", notesMeta.YearMonthDir)
-	}
 }
 
 func appendToFile(path string, contents string) error {

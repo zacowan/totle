@@ -24,13 +24,18 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path"
+	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
+const noteExtension = ".md"
+const notesDirConfigKey = "notes_dir"
+
 var cfgFile string
-const notesDirNameKey = "notesDir"
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -61,16 +66,16 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	viper.SetDefault(notesDirNameKey, "totle")
+	home, err := os.UserHomeDir()
+	cobra.CheckErr(err)
+
+	defaultNotesDir := path.Join(home, "Documents", "totle")
+	viper.SetDefault(notesDirConfigKey, defaultNotesDir)
 
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
 	} else {
-		// Find home directory.
-		home, err := os.UserHomeDir()
-		cobra.CheckErr(err)
-
 		// Search config in home directory with name ".totle" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigType("yaml")
@@ -83,5 +88,58 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+	}
+}
+
+type TodayFormatted struct {
+	Full string
+	Year string
+	Month string
+	Day string
+}
+
+type NotesMeta struct {
+	NotesDir string
+	YearMonthDir string
+	TodayNotePath string
+	TodayNoteFilename string
+	TodayFormatted TodayFormatted
+}
+
+func GetNotesMeta() NotesMeta {
+	notesMeta := NotesMeta{}
+	notesMeta.NotesDir = viper.GetString(notesDirConfigKey)
+	notesMeta.TodayFormatted = getTodayFormatted()
+	notesMeta.YearMonthDir = path.Join(notesMeta.NotesDir, notesMeta.TodayFormatted.Year, notesMeta.TodayFormatted.Month)
+	notesMeta.TodayNoteFilename = notesMeta.TodayFormatted.Full + noteExtension
+	notesMeta.TodayNotePath = path.Join(notesMeta.YearMonthDir, notesMeta.TodayNoteFilename)
+	return notesMeta
+}
+
+func CreateDirectoryIfNotFound(path string) (created bool, err error) {
+	if !PathExists(path) {
+		err = os.MkdirAll(path, os.ModePerm)
+		return err != nil, err
+	}
+	return false, nil
+}
+
+func PathExists(path string) bool {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true
+	}
+	return !os.IsNotExist(err)
+}
+
+// See https://gosamples.dev/date-format-yyyy-mm-dd/#:~:text=To%20format%20date%20in%20Go,%2F01%2F2006%22%20layout.
+func getTodayFormatted() TodayFormatted {
+	now := time.Now().Local()
+	full := now.Format("2006-01-02")
+	return TodayFormatted{
+		Full: full,
+		Year: strings.Split(full, "-")[0],
+		Month: strings.Split(full, "-")[1],
+		Day: strings.Split(full, "-")[2],
 	}
 }
