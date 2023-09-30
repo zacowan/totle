@@ -26,8 +26,6 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"github.com/zacowan/totle/internal"
 )
 
 // createCmd represents the create command
@@ -35,12 +33,11 @@ var createCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Creates a note file for today and opens it",
 	Run: func(cmd *cobra.Command, args []string) {
-		notesDirName := viper.GetString(notesDirNameKey)
-		notesMeta := internal.GetNotesMeta(notesDirName)
+		notesMeta := GetNotesMeta()
 
 		createYearMonthDir(notesMeta)
 
-		if !internal.PathExists(notesMeta.TodayNotePath) {
+		if !PathExists(notesMeta.TodayNotePath) {
 			todayAsMarkdownTitle := "# " + notesMeta.TodayFormatted.Full
 			createNoteFile(notesMeta.TodayNotePath, todayAsMarkdownTitle)
 		}
@@ -62,6 +59,17 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// createCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func createYearMonthDir(notesMeta NotesMeta) {
+	created, err := CreateDirectoryIfNotFound(notesMeta.YearMonthDir)
+	if err != nil {
+		fmt.Println("Failed to create year/month directory", notesMeta.YearMonthDir)
+		cobra.CheckErr(err)
+	}
+	if created {
+		fmt.Println("Created new directory at", notesMeta.YearMonthDir)
+	}
 }
 
 func createNoteFile(path string, contents string) {

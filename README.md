@@ -21,8 +21,7 @@ brew install totle
 
 ### Chocolatey
 
-> [!NOTE]
-> `totle` has only recently been published and needs to be verified by chocolatey. To install `totle` while the verification is in-progress, append the version you'd like to install with `--version=x.x.x`.
+> [!NOTE] > `totle` has only recently been published and needs to be verified by chocolatey. To install `totle` while the verification is in-progress, append the version you'd like to install with `--version=x.x.x`.
 
 ```sh
 choco install totle
@@ -84,7 +83,7 @@ Opens the note file for today using the `code` command.
 # The directory that your notes are stored in.
 #
 # Default: $HOME/Documents/totle
-notesDir: path/to/notes
+notes_dir: path/to/notes
 ```
 
 ## Contributing

@@ -28,17 +28,14 @@ import (
 	"path"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"github.com/zacowan/totle/internal"
 )
 
 // openCmd represents the open command
 var openCmd = &cobra.Command{
 	Use:   "open",
-	Short: "Opens today's note in VSCode",
+	Short: "Opens the note file for today",
 	Run: func(cmd *cobra.Command, args []string) {
-		notesDirName := viper.GetString(notesDirNameKey)
-		notesMeta := internal.GetNotesMeta(notesDirName)
+		notesMeta := GetNotesMeta()
 
 		gotoPath := getGotoPathForTodayNote(notesMeta)
 		err := openWithVsCode(notesMeta.NotesDir, gotoPath)
@@ -65,7 +62,7 @@ func init() {
 }
 
 func openWithVsCode(path string, gotoPath string) error {
-	if !internal.PathExists(path) {
+	if !PathExists(path) {
 		fmt.Println("Failed note - no note exists at", path)
 		os.Exit(0)
 	}
@@ -73,6 +70,6 @@ func openWithVsCode(path string, gotoPath string) error {
 	return codeCmd.Start()
 }
 
-func getGotoPathForTodayNote(notesMeta internal.NotesMeta) string {
+func getGotoPathForTodayNote(notesMeta NotesMeta) string {
 	return path.Join(notesMeta.TodayFormatted.Year, notesMeta.TodayFormatted.Month, notesMeta.TodayNoteFilename)
 }
