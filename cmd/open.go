@@ -23,9 +23,7 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
-	"path"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -57,19 +55,13 @@ func init() {
 
 func openNoteFile(notesMeta NotesMeta) {
 	openCmdFromConfig := viper.GetString(openCmdConfigKey)
-
-	if openCmdFromConfig != "" {
-		openWithCmd(openCmdFromConfig, notesMeta.TodayNotePath)
-	}
-
-	gotoPath := getGotoPathForTodayNote(notesMeta)
-	openWithCmd("code", notesMeta.TodayNotePath, "--goto " + gotoPath)
+	openWithCmd(openCmdFromConfig, notesMeta.TodayNotePath)
 }
 
 func openWithCmd(cmd string, path string, arg ...string) {
 	if !PathExists(path) {
 		fmt.Println("Failed to open - no note file exists at", path)
-		os.Exit(0)
+		return
 	}
 	args := []string{path}
 	args = append(args, arg...)
@@ -79,8 +71,4 @@ func openWithCmd(cmd string, path string, arg ...string) {
 		fmt.Printf("Failed while starting '%s' command\n", cmd)
 		cobra.CheckErr(err)
 	}
-}
-
-func getGotoPathForTodayNote(notesMeta NotesMeta) string {
-	return path.Join(notesMeta.TodayFormatted.Year, notesMeta.TodayFormatted.Month, notesMeta.TodayNoteFilename)
 }
