@@ -67,7 +67,7 @@ winget:
     repository:
       owner: zacowan
       name: winget-pkgs
-      branch: chore/totle-release-{{.Version}}
+      branch: zacowan/totle-{{.Version}}
       token: "{{ .Env.WINGET_PKGS_GITHUB_TOKEN }}"
       pull_request:
         enabled: true

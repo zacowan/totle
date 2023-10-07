@@ -22,9 +22,6 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version: stable
-      - uses: crazy-max/ghaction-chocolatey@v3
-        with:
-          args: -h
       - uses: goreleaser/goreleaser-action@v5
         with:
           distribution: goreleaser
@@ -33,4 +30,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAP_GITHUB_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
-          CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
+          WINGET_PKGS_GITHUB_TOKEN: ${{ secrets.WINGET_PKGS_GITHUB_TOKEN }}
