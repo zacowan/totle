@@ -11,14 +11,14 @@
 
 ## Installation
 
-### Homebrew
+### Homebrew (macOS/Linux)
 
 ```sh
 brew tap zacowan/tap
 brew install zacowan/tap/totle
 ```
 
-### Scoop
+### Scoop (Windows)
 
 ```sh
 scoop bucket add zacowan https://github.com/zacowan/scoop-bucket.git
