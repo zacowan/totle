@@ -43,25 +43,35 @@ changelog:
       - "^ci(\\(.*\\))?:"
       - "^refactor(\\(.*\\))?:"
 
-brews:
-  - homepage: https://github.com/zacowan/totle
-    description: "totle is a simple tool to allow developers to jot down their thoughts for safe-keeping in a transferrable format."
+# brews:
+#   - homepage: https://github.com/zacowan/totle
+#     description: "totle is a simple tool to allow developers to jot down their thoughts for safe-keeping in a transferrable format."
+#     repository:
+#       owner: zacowan
+#       name: homebrew-tap
+#       token: "{{ .Env.TAP_GITHUB_TOKEN }}"
+
+winget:
+  - publisher: Zachary Cowan
+    short_description: "totle is a simple tool to allow developers to jot down their thoughts for safe-keeping in a transferrable format."
+    license: "mit"
+    publisher_url: https://www.zacowan.com
+    publisher_support_url: https://github.com/zacowan/totle/issues/new
+    homepage: https://github.com/zacowan/totle
+    license_url: https://github.com/zacowan/totle/blob/main/LICENSE
+    release_notes: "{{.Changelog}}"
+    tags:
+      - markdown
+      - cli
+      - notes
     repository:
       owner: zacowan
-      name: homebrew-tap
-      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
-
-chocolateys:
-  - owners: Zachary Cowan
-    authors: Zachary Cowan
-    project_url: https://github.com/zacowan/totle
-    copyright: 2023 Zachary Cowan
-    license_url: https://github.com/zacowan/totle/blob/main/LICENSE
-    project_source_url: https://github.com/zacowan/totle
-    docs_url: https://github.com/zacowan/totle/blob/main/README.md
-    bug_tracker_url: https://github.com/zacowan/totle/issues
-    tags: "notes markdown cli"
-    summary: "totle is a simple tool to allow developers to jot down their thoughts for safe-keeping in a transferrable format."
-    description: "totle is a simple tool to allow developers to jot down their thoughts for safe-keeping in a transferrable format."
-    api_key: "{{ .Env.CHOCOLATEY_API_KEY }}"
-    source_repo: "https://push.chocolatey.org/"
+      name: winget-pkgs
+      branch: chore/totle-release-{{.Version}}
+      token: "{{ .Env.WINGET_PKGS_GITHUB_TOKEN }}"
+      pull_request:
+        enabled: true
+        base:
+          owner: microsoft
+          name: winget-pkgs
+          branch: master
