@@ -51,20 +51,11 @@ brews:
       name: homebrew-tap
       token: "{{ .Env.TAP_GITHUB_TOKEN }}"
 
-winget:
-  - publisher: zacowan
-    short_description: "totle is a simple tool to allow developers to jot down their thoughts for safe-keeping in a transferrable format."
-    license: "mit"
-    publisher_url: https://www.zacowan.com
-    publisher_support_url: https://github.com/zacowan/totle/issues/new
-    homepage: https://github.com/zacowan/totle
-    license_url: https://github.com/zacowan/totle/blob/main/LICENSE
-    release_notes: "{{.Changelog}}"
-    tags:
-      - markdown
-      - cli
-      - notes
+scoops:
+  - homepage: https://github.com/zacowan/totle
+    description: "totle is a simple tool to allow developers to jot down their thoughts for safe-keeping in a transferrable format."
+    license: MIT
     repository:
       owner: zacowan
-      name: winget-pkgs
-      token: "{{ .Env.WINGET_PKGS_GITHUB_TOKEN }}"
+      name: scoop-buckets
+      token: "{{ .Env.SCOOP_BUCKET_GITHUB_TOKEN }}"
