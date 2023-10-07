@@ -52,8 +52,7 @@ brews:
       token: "{{ .Env.TAP_GITHUB_TOKEN }}"
 
 winget:
-  - publisher: Zachary Cowan
-    package_identifier: zacowan.totle
+  - publisher: zacowan
     short_description: "totle is a simple tool to allow developers to jot down their thoughts for safe-keeping in a transferrable format."
     license: "mit"
     publisher_url: https://www.zacowan.com
@@ -68,11 +67,4 @@ winget:
     repository:
       owner: zacowan
       name: winget-pkgs
-      branch: zacowan/totle-{{.Version}}
       token: "{{ .Env.WINGET_PKGS_GITHUB_TOKEN }}"
-      pull_request:
-        enabled: true
-        base:
-          owner: microsoft
-          name: winget-pkgs
-          branch: master
