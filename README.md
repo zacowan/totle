@@ -15,18 +15,14 @@
 
 ```sh
 brew tap zacowan/tap
-brew install totle
+brew install zacowan/tap/totle
 ```
 
-### Chocolatey
-
-<!-- prettier-ignore-start -->
-> [!NOTE]
-> `totle` has only recently been published and needs to be verified by chocolatey. To install `totle` while the verification is in-progress, append the version you'd like to install with `--version=x.x.x`.
-<!-- prettier-ignore-end -->
+### Scoop
 
 ```sh
-choco install totle
+scoop bucket add zacowan https://github.com/zacowan/scoop-bucket.git
+scoop install zacowan/totle
 ```
 
 ## Usage
