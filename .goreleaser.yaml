@@ -53,6 +53,7 @@ brews:
 
 winget:
   - publisher: Zachary Cowan
+    package_identifier: zacowan.totle
     short_description: "totle is a simple tool to allow developers to jot down their thoughts for safe-keeping in a transferrable format."
     license: "mit"
     publisher_url: https://www.zacowan.com
