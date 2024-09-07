@@ -27,6 +27,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/zacowan/totle/pkg/fileops"
 )
 
 // openCmd represents the open command
@@ -59,7 +60,7 @@ func openNoteFile(notesMeta NotesMeta) {
 }
 
 func openWithCmd(cmd string, path string, arg ...string) {
-	if !PathExists(path) {
+	if !fileops.PathExists(path) {
 		fmt.Println("Failed to open - no note file exists at", path)
 		return
 	}
