@@ -75,7 +75,7 @@ func initConfig() {
 
 	defaultNotesDir := path.Join(home, "Documents", "totle")
 	viper.SetDefault(notesDirConfigKey, defaultNotesDir)
-	viper.SetDefault(openCmdConfigKey, "code")
+	viper.SetDefault(openCmdConfigKey, "vi")
 
 	if cfgFile != "" {
 		// Use config file from the flag.

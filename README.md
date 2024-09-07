@@ -73,7 +73,7 @@ For example, `totle add "Hello, world"` would produce the following note file co
 totle open
 ```
 
-Opens the note file for today using the configured `open_cmd` command. By default, the note file is opened using the `code` command provided by VSCode.
+Opens the note file for today using the configured `open_cmd` command. By default, the note file is opened using the `vi` command.
 
 ### Configuration
 
@@ -83,8 +83,8 @@ Opens the note file for today using the configured `open_cmd` command. By defaul
 # The command to use when opening a note file. The command is passed
 # the path to the note file as the first and only argument.
 #
-# Default: code
-open_cmd: open
+# Default: vi
+open_cmd: code
 
 # The directory that your notes are stored in.
 #
