@@ -27,6 +27,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/zacowan/totle/pkg/fileops"
 )
 
 // addCmd represents the add command
@@ -44,7 +45,7 @@ the contents of the note you want to add are appended to that file.`,
 
 		createYearMonthDir(notesMeta)
 
-		if !PathExists(notesMeta.TodayNotePath) {
+		if !fileops.PathExists(notesMeta.TodayNotePath) {
 			titleWithProvidedNoteAsMarkdown := "# " + notesMeta.TodayFormatted.Full + "\n\n- " + providedNote
 			createNoteFile(notesMeta.TodayNotePath, titleWithProvidedNoteAsMarkdown)
 			os.Exit(0)
@@ -59,7 +60,7 @@ the contents of the note you want to add are appended to that file.`,
 		if lastLineOfNoteFile != "" {
 			providedNoteAsMarkdown = "\n" + providedNoteAsMarkdown
 		}
-		appendToFile(notesMeta.TodayNotePath, providedNoteAsMarkdown)
+		fileops.AppendToFile(notesMeta.TodayNotePath, providedNoteAsMarkdown)
 	},
 }
 
@@ -75,20 +76,6 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// addCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-}
-
-func appendToFile(path string, contents string) error {
-	file, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	if _, err := file.Write([]byte(contents)); err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func getLastLineOfFile(path string) (lastLine string, err error) {

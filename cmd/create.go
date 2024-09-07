@@ -23,9 +23,9 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/zacowan/totle/pkg/fileops"
 )
 
 // createCmd represents the create command
@@ -37,7 +37,7 @@ var createCmd = &cobra.Command{
 
 		createYearMonthDir(notesMeta)
 
-		if !PathExists(notesMeta.TodayNotePath) {
+		if !fileops.PathExists(notesMeta.TodayNotePath) {
 			todayAsMarkdownTitle := "# " + notesMeta.TodayFormatted.Full
 			createNoteFile(notesMeta.TodayNotePath, todayAsMarkdownTitle)
 		}
@@ -61,7 +61,7 @@ func init() {
 }
 
 func createYearMonthDir(notesMeta NotesMeta) {
-	created, err := CreateDirectoryIfNotFound(notesMeta.YearMonthDir)
+	created, err := fileops.CreateDirectoryIfNotFound(notesMeta.YearMonthDir)
 	if err != nil {
 		fmt.Println("Failed to create year/month directory", notesMeta.YearMonthDir)
 		cobra.CheckErr(err)
@@ -72,7 +72,7 @@ func createYearMonthDir(notesMeta NotesMeta) {
 }
 
 func createNoteFile(path string, contents string) {
-	err := os.WriteFile(path, []byte(contents), os.ModePerm)
+	err := fileops.CreateFile(path, contents)
 	if err != nil {
 		fmt.Println("Failed to create note file at", path)
 		cobra.CheckErr(err)
